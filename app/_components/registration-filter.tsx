@@ -1,7 +1,14 @@
 "use client";
 import { useState, useEffect, useDeferredValue, use } from "react";
 
-import { Search, Calendar as CalendarIcon, X, LogOut } from "lucide-react";
+import {
+  Search,
+  Calendar as CalendarIcon,
+  X,
+  LogOut,
+  FileSpreadsheet,
+  Database,
+} from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { RegistrationCard } from "./registration-card";
@@ -134,6 +141,26 @@ export function RegistrationFilter({
     window.location.href = "/login";
   };
 
+  const handleExport = (type: "excel" | "crm") => {
+    const params = new URLSearchParams();
+    params.set("type", type);
+    if (localDate) {
+      params.set("date", localDate.toISOString());
+    }
+    if (searchTerm) {
+      params.set("query", searchTerm);
+    }
+
+    // Use a hidden anchor to trigger download without opening a new 'black' tab
+    const url = `/api/export?${params.toString()}`;
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `export-${type}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleDateChange = (d: Date | undefined) => {
     setLocalDate(d);
     setCurrentPage(1);
@@ -177,31 +204,34 @@ export function RegistrationFilter({
   const hasFilters = search || date;
 
   return (
-    <div className="space-y-8">
-      {/* Filters Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="flex items-center justify-between lg:justify-start gap-4">
-          <div className="text-left">
-            <h1 className="text-xl sm:text-3xl font-semibold text-white/90">
-              Study Abroad & <br /> International Education Fair
-            </h1>
-            <p className="text-white/50 text-[12px] sm:text-sm mt-1">
-              Track and manage attendees for the upcoming event
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="lg:hidden bg-red-200 rounded-full text-red-500 hover:text-red-400 hover:bg-red-400/10 cursor-pointer"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+    <div className="space-y-10">
+      <div className="flex flex-col items-center gap-8 py-6">
+        {/* Centered Title */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-4xl font-bold bg-linear-to-b from-white to-white/60 bg-clip-text text-transparent tracking-tight">
+            Study Abroad & International Education Fair
+          </h1>
+          <p className="text-white/40 text-sm sm:text-base max-w-xl mx-auto px-4">
+            Manage registrations and export attendee data for the upcoming event
+          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+        {/* Filters and Actions Bar */}
+        <div className="relative flex flex-wrap items-center justify-center gap-3 w-full max-w-6xl">
+          {/* Mobile Clear All Button */}
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={clearAll}
+              className="lg:hidden absolute -bottom-10 right-0 h-7 px-2 bg-red-300 border border-red-400/50 text-red-500 hover:text-red-400 hover:bg-red-400/10 transition-all hover:border-red-400/20 cursor-pointer shrink-0 z-20"
+            >
+              <X className="h-4 w-4 mr-1 text-red-500 font-bold" />
+              Clear
+            </Button>
+          )}
+
           {/* Search Input */}
-          <div className="relative group flex-1 sm:w-80 w-full">
+          <div className="relative group w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-primary transition-colors" />
             <input
               type="text"
@@ -210,8 +240,8 @@ export function RegistrationFilter({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search by name or phone..."
-              className="w-full h-10 bg-white/5 border border-white/10 rounded-lg pl-10 pr-10 text-sm text-white placeholder:text-white/20 focus:outline-hidden focus:border-primary/50 focus:bg-white/8 transition-all"
+              placeholder="Search attendees..."
+              className="w-full h-10 bg-white/5 border border-white/10 rounded-xl pl-10 pr-10 text-sm text-white placeholder:text-white/20 focus:outline-hidden focus:border-primary/50 focus:bg-white/8 transition-all"
             />
             {searchTerm && (
               <button
@@ -226,27 +256,51 @@ export function RegistrationFilter({
             )}
           </div>
 
-          {/* Date Picker & Clear All */}
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 min-w-0 sm:w-auto sm:flex-initial">
-              <DatePicker date={localDate} onChange={handleDateChange} />
-            </div>
-            {hasFilters && (
-              <Button
-                variant="ghost"
-                onClick={clearAll}
-                className="h-10 px-3 text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all border border-transparent hover:border-red-400/20 cursor-pointer shrink-0"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear All
-              </Button>
-            )}
+          {/* Date Picker */}
+          <div className="w-full sm:w-auto">
+            <DatePicker date={localDate} onChange={handleDateChange} />
           </div>
-          {/* Desktop Logout */}
+
+          {/* Clear All (Desktop Only) */}
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={clearAll}
+              className="hidden lg:flex h-10 px-3 text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all border border-transparent hover:border-red-400/20 cursor-pointer shrink-0"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+          )}
+
+          {/* Divider (Desktop) */}
+          <div className="hidden sm:block w-px h-6 bg-white/10 mx-2" />
+
+          {/* Export Actions */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={() => handleExport("excel")}
+              className="flex-1 sm:flex-none h-10 px-4 bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/30 cursor-pointer transition-all rounded-xl"
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Excel
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleExport("crm")}
+              className="flex-1 sm:flex-none h-10 px-4 bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/30 cursor-pointer transition-all rounded-xl"
+            >
+              <Database className="h-4 w-4 mr-2" />
+              CRM
+            </Button>
+          </div>
+
+          {/* Logout Button */}
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="hidden lg:flex h-10 px-4 bg-white/5 border-white/10 text-white/60 hover:text-red-400 hover:bg-red-400/10 hover:border-red-400/20 cursor-pointer transition-all"
+            className="w-full sm:w-auto h-10 px-4 bg-white/5 border-white/10 text-white/60 hover:text-red-400 hover:bg-red-400/10 hover:border-red-400/20 cursor-pointer transition-all rounded-xl"
           >
             <LogOut className="h-4 w-4 mr-2 text-red-400" />
             Logout
@@ -256,7 +310,7 @@ export function RegistrationFilter({
 
       {/* Pagination and Status Bar */}
       {totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 border-y border-white/5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 border-y border-white/5 md:-mt-8">
           <div className="text-white/40 text-[11px] sm:text-xs font-medium text-center sm:text-left">
             Showing <span className="text-white/70">{startIndex + 1}</span>-
             <span className="text-white/70">
