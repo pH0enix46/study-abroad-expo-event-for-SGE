@@ -25,7 +25,7 @@ import { LucideIcon } from "lucide-react";
 
 function UserAvatar() {
   return (
-    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/8 border border-white/8 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white/8 border border-white/8 flex items-center justify-center shrink-0">
       <User className="h-4 w-4 sm:h-5 sm:w-5 text-white/50" />
     </div>
   );
@@ -191,19 +191,14 @@ export function RegistrationCard({
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* User basic info */}
-        <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
           <UserAvatar />
           <div className="min-w-0 flex-1">
             <h3 className="text-base sm:text-lg font-semibold text-white/80 group-hover:text-white/90 transition-colors break-words">
               {registration.fullName || "Unknown"}
             </h3>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 text-sm mt-1.5 sm:mt-1">
-              <ContactInfo
-                icon={Mail}
-                value={registration.email}
-                onCopy={handleCopy}
-                label="Email"
-              />
+            {/* Desktop Phone - Hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-4 text-sm mt-1">
               <ContactInfo
                 icon={Phone}
                 value={phoneValue}
@@ -214,8 +209,18 @@ export function RegistrationCard({
           </div>
         </div>
 
-        {/* Date and Toggle */}
+        {/* Date and Mobile Phone Section */}
         <div className="flex items-center justify-between md:justify-end gap-4 md:gap-5 w-full md:w-auto pt-3 md:pt-0 border-t border-white/5 md:border-t-0">
+          {/* Mobile Phone - Hidden on desktop */}
+          <div className="sm:hidden flex-1">
+            <ContactInfo
+              icon={Phone}
+              value={phoneValue}
+              onCopy={handleCopy}
+              label="Phone number"
+            />
+          </div>
+
           <div className="flex flex-col items-end gap-0.5">
             <span className="text-[10px] uppercase tracking-widest text-white/30 font-bold">
               Registered
@@ -245,28 +250,12 @@ export function RegistrationCard({
         )}
       >
         <div className="overflow-hidden">
-          <div className="p-5 md:p-6 border-t border-white/6 bg-black/20 gap-8 flex flex-col">
+          <div className="p-5 md:p-6 border-t border-white/6 bg-black/20 gap-6 flex flex-col">
             {/* Info Metrics Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <InfoMetric
                 icon={Globe2}
-                label="Residence & Citizenship"
-                value={
-                  registration.residence
-                    ? `${registration.residence}${
-                        registration.citizenship &&
-                        registration.citizenship !== registration.residence
-                          ? ` (${registration.citizenship} Citizen)`
-                          : ""
-                      }`
-                    : "N/A"
-                }
-                iconBg="bg-blue-500/20"
-                iconColor="text-blue-400"
-              />
-              <InfoMetric
-                icon={MapPin}
-                label="Study Destinations"
+                label="Preferred Countries"
                 value={
                   Array.isArray(registration.studyDestinations) &&
                   registration.studyDestinations.length > 0
@@ -278,41 +267,37 @@ export function RegistrationCard({
               />
               <InfoMetric
                 icon={GraduationCap}
-                label="Preferred Level"
+                label="Entry Level"
                 value={registration.preferredStudyLevel || "N/A"}
                 iconBg="bg-emerald-500/20"
                 iconColor="text-emerald-400"
               />
               <InfoMetric
+                icon={BookOpen}
+                label="Subject Preference"
+                value={registration.preferredSubject || "N/A"}
+                iconBg="bg-indigo-500/20"
+                iconColor="text-indigo-400"
+              />
+              <InfoMetric
                 icon={FileText}
-                label="English Test & Score"
+                label="English Qualification"
                 value={
                   registration.noEnglishCert
                     ? "No Certificate"
-                    : registration.englishTest || registration.englishScore
-                      ? `${registration.englishTest || "N/A"} (${registration.englishScore || "No Score"})`
-                      : "N/A"
+                    : `${registration.englishTest || "N/A"} (${registration.englishScore || "No Score"})`
                 }
                 iconBg="bg-amber-500/20"
                 iconColor="text-amber-400"
               />
-              <div className="lg:col-span-1">
-                <InfoMetric
-                  icon={BookOpen}
-                  label="Preferred Subject"
-                  value={registration.preferredSubject || "N/A"}
-                  iconBg="bg-indigo-500/20"
-                  iconColor="text-indigo-400"
-                />
-              </div>
             </div>
 
-            {/* Expanded Details Layout */}
-            <div className="flex flex-col gap-8">
-              {/* Academic History */}
+            {/* Details and Event Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              {/* Last Academic Qualification */}
               <div className="space-y-4">
                 <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest flex items-center gap-2 border-b border-white/5 pb-2">
-                  <BookOpen className="h-3 w-3" /> Academic History
+                  <GraduationCap className="h-3 w-3" /> Last Qualification
                 </h4>
                 {Array.isArray(registration.academicHistory) &&
                 registration.academicHistory.length > 0 ? (
@@ -322,132 +307,89 @@ export function RegistrationCard({
                       (history: any, idx: number) => (
                         <div
                           key={idx}
-                          className="bg-white/3 border border-white/5 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-6 hover:bg-white/5 transition-all duration-300 w-full"
+                          className="bg-white/3 border border-white/5 rounded-xl p-4 flex flex-col gap-3 hover:bg-white/5 transition-all duration-300 w-full"
                         >
-                          <div className="flex flex-col gap-1">
-                            <p className="text-[10px] text-white/40 uppercase tracking-wider">
-                              Qualification
-                            </p>
-                            <p className="text-[13px] text-white/90 font-medium leading-relaxed">
-                              {history.qualification || "-"}
-                            </p>
+                          <div className="flex justify-between items-center">
+                            <div className="flex flex-col gap-1">
+                              <p className="text-[10px] text-white/40 uppercase tracking-wider">
+                                Qualification
+                              </p>
+                              <p className="text-sm text-white/90 font-medium">
+                                {history.qualification || "-"}
+                              </p>
+                            </div>
+                            {history.year && (
+                              <div className="flex flex-col gap-1 text-right">
+                                <p className="text-[10px] text-white/40 uppercase tracking-wider">
+                                  Year
+                                </p>
+                                <p className="text-sm text-white/60">
+                                  {history.year}
+                                </p>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex flex-col gap-1">
-                            <p className="text-[10px] text-white/40 uppercase tracking-wider">
-                              Subject
-                            </p>
-                            <p className="text-[13px] text-white/90 font-medium leading-relaxed">
-                              {history.subject || "-"}
-                            </p>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <p className="text-[10px] text-white/40 uppercase tracking-wider">
-                              Year
-                            </p>
-                            <p className="text-[13px] text-white/90 font-medium leading-relaxed">
-                              {history.year || "-"}
-                            </p>
-                          </div>
+                          {history.subject && (
+                            <div className="flex flex-col gap-1 border-t border-white/5 pt-2">
+                              <p className="text-[10px] text-white/40 uppercase tracking-wider">
+                                Subject
+                              </p>
+                              <p className="text-xs text-white/70">
+                                {history.subject}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       ),
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-white/30 italic px-1">
-                    No academic history provided
-                  </p>
+                  <div className="bg-white/3 border border-white/5 rounded-xl p-4 text-center">
+                    <p className="text-sm text-white/20 italic tracking-wide">
+                      No qualification history
+                    </p>
+                  </div>
                 )}
               </div>
 
-              {/* Work Experience and Event Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                {/* Work Experience */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest flex items-center gap-2 border-b border-white/5 pb-2">
-                    <Briefcase className="h-3 w-3" /> Work Experience
-                  </h4>
-                  <div className="bg-white/3 border border-white/5 rounded-xl p-4 text-sm text-white/80 leading-relaxed italic min-h-30 flex items-start">
-                    {registration.workExperience === "Yes" ? (
-                      <p>
-                        &quot;
-                        {registration.workDetails ||
-                          "Yes, but no details provided."}
-                        &quot;
-                      </p>
-                    ) : (
-                      <div className="w-full flex items-center justify-center h-full self-center">
-                        <p className="text-sm text-white/20 italic tracking-wide">
-                          No prior work experience recorded
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Event Details */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest flex items-center gap-2 border-b border-white/5 pb-2">
-                    <LinkIcon className="h-3 w-3" /> Event Details
-                  </h4>
-                  <div className="bg-white/3 border border-white/5 rounded-xl p-4 space-y-4 min-h-30 flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] text-white/40 uppercase tracking-wider">
-                          Source Name
+              {/* Registration Info */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest flex items-center gap-2 border-b border-white/5 pb-2">
+                  <LinkIcon className="h-3 w-3" /> Registration Info
+                </h4>
+                <div className="bg-white/3 border border-white/5 rounded-xl p-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-white/40 uppercase tracking-wider">
+                        Source Link
+                      </span>
+                      {registration.eventSourceLink ? (
+                        <a
+                          href={registration.eventSourceLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm text-blue-400/80 hover:text-blue-400 underline break-all transition-colors font-medium"
+                        >
+                          {registration.eventSourceLink}
+                        </a>
+                      ) : (
+                        <span className="text-sm text-white/40 italic">
+                          Not available
                         </span>
-                        <span className="text-sm text-white/90 font-medium">
-                          {registration.eventSourceName || "N/A"}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] text-white/40 uppercase tracking-wider">
-                          Source Link
-                        </span>
-                        {registration.eventSourceLink ? (
-                          <a
-                            href={registration.eventSourceLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-sm text-blue-400/80 hover:text-blue-400 underline break-all transition-colors font-medium"
-                          >
-                            {registration.eventSourceLink}
-                          </a>
-                        ) : (
-                          <span className="text-sm text-white/40 italic">
-                            Not available
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/5 mt-auto">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] text-white/40 uppercase tracking-wider">
-                          Registration ID
-                        </span>
-                        <span className="text-sm text-white/90 font-mono">
-                          {registration._id.substring(0, 8)}...
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">
-                          Ref Code
-                        </span>
-                        <span className="text-sm text-white/90 font-mono">
-                          {registration.referralCode || "N/A"}
-                        </span>
-                      </div>
+
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-white/40 uppercase tracking-wider">
+                        Registration ID
+                      </span>
+                      <span className="text-sm text-white/90 font-mono break-all">
+                        {registration._id}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Notes Section */}
-            <div className="pt-2 border-t border-white/5">
-              <NotesSection
-                notes={registration.notes}
-                newNote={registration.newNote}
-              />
             </div>
           </div>
         </div>
