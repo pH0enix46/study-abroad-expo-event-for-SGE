@@ -2,19 +2,15 @@
 
 import React, { useState } from "react";
 import {
-  Mail,
   Phone,
-  MapPin,
   BookOpen,
   GraduationCap,
   Globe2,
   FileText,
   Link as LinkIcon,
-  Briefcase,
   Copy,
   ChevronDown,
   User,
-  Edit3,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -97,53 +93,6 @@ function InfoMetric({
   );
 }
 
-function NotesSection({
-  notes,
-  newNote: initialNote,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  notes?: any[];
-  newNote?: string;
-}) {
-  const [newNote] = useState(initialNote || "");
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="text-xs font-semibold text-white/50 uppercase tracking-widest flex items-center gap-2">
-          <Edit3 className="h-3 w-3" /> Additional Notes
-        </h4>
-      </div>
-
-      <div className="bg-white/3 rounded-xl p-4 text-sm text-white/70 min-h-15 border border-white/6">
-        {newNote ? (
-          <p className="text-white/80 italic">&quot;{newNote}&quot;</p>
-        ) : (
-          <p className="text-white/30 italic">No notes available.</p>
-        )}
-
-        {Array.isArray(notes) && notes.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
-            <p className="text-xs text-white/40 uppercase">All Notes:</p>
-            {[...notes].reverse().map((n, i) => {
-              const noteText = typeof n === "object" ? n.note : n;
-
-              return (
-                <div
-                  key={i}
-                  className="group/note flex items-start gap-2 bg-white/4 p-2 rounded-lg italic text-white/60 text-xs"
-                >
-                  <p className="flex-1">{noteText}</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // --- Main Registration Card Component ---
 
 export function RegistrationCard({
@@ -182,7 +131,7 @@ export function RegistrationCard({
     <div
       className={cn(
         "w-full relative rounded-2xl overflow-hidden transition-all duration-300 group border border-white/6 bg-white/2 backdrop-blur-sm shadow-xs",
-        isOpen && "ring-1 ring-white/10",
+        isOpen && "",
       )}
     >
       {/* Header */}

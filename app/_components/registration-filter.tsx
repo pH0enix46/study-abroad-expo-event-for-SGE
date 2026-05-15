@@ -88,7 +88,7 @@ export function RegistrationFilter({
 
   const search = searchParams.get("query") || "";
   const dateParam = searchParams.get("date");
-  const date = dateParam ? new Date(dateParam) : undefined;
+  const date = dateParam ? new Date(dateParam + "T00:00:00") : undefined;
 
   const [searchTerm, setSearchTerm] = useState(search);
   const deferredSearchTerm = useDeferredValue(searchTerm);
@@ -101,7 +101,7 @@ export function RegistrationFilter({
     if (searchTerm) params.set("query", searchTerm);
     else params.delete("query");
 
-    if (localDate) params.set("date", localDate.toISOString());
+    if (localDate) params.set("date", format(localDate, "yyyy-MM-dd"));
     else params.delete("date");
 
     const queryString = params.toString();
@@ -121,7 +121,7 @@ export function RegistrationFilter({
       const q = params.get("query") || "";
       const d = params.get("date");
       setSearchTerm(q);
-      setLocalDate(d ? new Date(d) : undefined);
+      setLocalDate(d ? new Date(d + "T00:00:00") : undefined);
       setCurrentPage(1);
     };
 
@@ -145,7 +145,7 @@ export function RegistrationFilter({
     const params = new URLSearchParams();
     params.set("type", type);
     if (localDate) {
-      params.set("date", localDate.toISOString());
+      params.set("date", format(localDate, "yyyy-MM-dd"));
     }
     if (searchTerm) {
       params.set("query", searchTerm);
@@ -223,7 +223,7 @@ export function RegistrationFilter({
             <Button
               variant="ghost"
               onClick={clearAll}
-              className="lg:hidden absolute -bottom-10 right-0 h-7 px-2 bg-red-300 border border-red-400/50 text-red-500 hover:text-red-400 hover:bg-red-400/10 transition-all hover:border-red-400/20 cursor-pointer shrink-0 z-20"
+              className="md:hidden absolute -bottom-10 right-0 h-7 px-2 bg-red-300 border border-red-400/50 text-red-500 hover:text-red-400 hover:bg-red-400/10 transition-all hover:border-red-400/20 cursor-pointer shrink-0 z-20"
             >
               <X className="h-4 w-4 mr-1 text-red-500 font-bold" />
               Clear
@@ -249,7 +249,7 @@ export function RegistrationFilter({
                   setSearchTerm("");
                   setCurrentPage(1);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/90 transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -266,7 +266,7 @@ export function RegistrationFilter({
             <Button
               variant="ghost"
               onClick={clearAll}
-              className="hidden lg:flex h-10 px-3 text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all border border-transparent hover:border-red-400/20 cursor-pointer shrink-0"
+              className="hidden md:flex h-10 px-3 text-red-400/70 hover:text-red-400 hover:bg-red-400/10 transition-all border border-transparent hover:border-red-400/20 cursor-pointer shrink-0"
             >
               <X className="h-4 w-4 mr-2" />
               Clear
