@@ -79,7 +79,7 @@ export async function getRegistrations() {
     const res = await secureApiFetch(
       `${API_BASE}/expoRegistration?${query.toString()}`,
       {
-        cache: "no-store", // Ensure fresh data
+        next: { revalidate: 60 }, // ISR: revalidate every 60s, allows static build
       },
     );
 
@@ -90,7 +90,7 @@ export async function getRegistrations() {
 
     const payload = await res.json();
     const data = payload.data || [];
-    
+
     // Filter out test registrations (where name includes "test")
     return data.filter((reg: any) => {
       const name = (reg.fullName || "").toLowerCase();
