@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useDeferredValue } from "react";
+import { useState, useEffect, useDeferredValue, use } from "react";
 
 import { Search, Calendar as CalendarIcon, X, LogOut } from "lucide-react";
 import { format, isSameDay } from "date-fns";
@@ -70,10 +70,11 @@ function DatePicker({
 
 // --- Main Filter Component ---
 export function RegistrationFilter({
-  registrations,
+  registrationsPromise,
 }: {
-  registrations: any[];
+  registrationsPromise: Promise<any[]>;
 }) {
+  const registrations = use(registrationsPromise);
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
