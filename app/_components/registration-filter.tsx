@@ -8,6 +8,7 @@ import {
   LogOut,
   FileSpreadsheet,
   Database,
+  Users,
 } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { useSearchParams } from "next/navigation";
@@ -204,7 +205,7 @@ export function RegistrationFilter({
   const hasFilters = search || date;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-32">
       <div className="flex flex-col items-center gap-8 py-6">
         {/* Centered Title */}
         <div className="text-center space-y-2">
@@ -308,73 +309,22 @@ export function RegistrationFilter({
         </div>
       </div>
 
-      {/* Pagination and Status Bar */}
-      {totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 border-y border-white/5 md:-mt-8">
-          <div className="text-white/40 text-[11px] sm:text-xs font-medium text-center sm:text-left">
-            Showing <span className="text-white/70">{startIndex + 1}</span>-
-            <span className="text-white/70">
-              {Math.min(startIndex + itemsPerPage, totalItems)}
-            </span>{" "}
-            of <span className="text-white/70">{totalItems}</span> registrations
-          </div>
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center flex-wrap gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="h-8 w-8 p-0 bg-white/5 border-white/10 text-white/50 hover:text-white disabled:opacity-30 transition-all"
-              >
-                {"<"}
-              </Button>
-              <div className="flex items-center gap-1 px-2">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum = currentPage;
-                  if (totalPages <= 5) pageNum = i + 1;
-                  else if (currentPage <= 3) pageNum = i + 1;
-                  else if (currentPage >= totalPages - 2)
-                    pageNum = totalPages - 4 + i;
-                  else pageNum = currentPage - 2 + i;
-
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={currentPage === pageNum ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={cn(
-                        "h-8 w-8 p-0 text-xs transition-all",
-                        currentPage === pageNum
-                          ? "bg-primary hover:bg-primary/90 text-white border-transparent shadow-lg shadow-primary/20"
-                          : "bg-white/5 border-white/10 text-white/50 hover:text-white",
-                      )}
-                    >
-                      {pageNum}
-                    </Button>
-                  );
-                })}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                className="h-8 w-8 p-0 bg-white/5 border-white/10 text-white/50 hover:text-white disabled:opacity-30 transition-all"
-              >
-                {">"}
-              </Button>
-            </div>
-          )}
+      {/* Total Summary */}
+      <div className="flex items-center gap-3 px-1">
+        <div className="flex items-center gap-2.5 px-4 py-2 bg-white/6 border border-white/8 rounded-full backdrop-blur-md animate-in fade-in slide-in-from-left-4 duration-500">
+          <Users className="h-4 w-4 text-primary" />
+          <span className="text-white/50 text-[10px] font-bold uppercase tracking-widest">
+            Total Registrations
+          </span>
+          <div className="w-px h-3 bg-white/10 mx-1" />
+          <span className="text-white/90 text-base font-bold leading-none">
+            {registrations.length}
+          </span>
         </div>
-      )}
+      </div>
 
       {/* Data List */}
-      <div className="space-y-4 min-h-[400px]">
+      <div className="space-y-4 min-h-[400px] -mt-6">
         {filteredRegistrations.length === 0 ? (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center animate-in fade-in duration-500">
             <p className="text-white/60">
@@ -405,6 +355,76 @@ export function RegistrationFilter({
           </div>
         )}
       </div>
+
+      {/* Pagination and Status Bar (Floating) */}
+      {totalItems > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-3 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+            <div className="text-white/40 text-[11px] sm:text-xs font-medium text-center sm:text-left">
+              Showing <span className="text-white/70">{startIndex + 1}</span>-
+              <span className="text-white/70">
+                {Math.min(startIndex + itemsPerPage, totalItems)}
+              </span>{" "}
+              of <span className="text-white/70">{totalItems}</span>{" "}
+              registrations
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center flex-wrap gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="h-8 w-8 p-0 bg-white/5 border-white/10 text-white/50 hover:text-white disabled:opacity-30 transition-all"
+                >
+                  {"<"}
+                </Button>
+                <div className="flex items-center gap-1 px-2">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum = currentPage;
+                    if (totalPages <= 5) pageNum = i + 1;
+                    else if (currentPage <= 3) pageNum = i + 1;
+                    else if (currentPage >= totalPages - 2)
+                      pageNum = totalPages - 4 + i;
+                    else pageNum = currentPage - 2 + i;
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={
+                          currentPage === pageNum ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={cn(
+                          "h-8 w-8 p-0 text-xs transition-all",
+                          currentPage === pageNum
+                            ? "bg-primary hover:bg-primary/90 text-white border-transparent shadow-lg shadow-primary/20"
+                            : "bg-white/5 border-white/10 text-white/50 hover:text-white",
+                        )}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  className="h-8 w-8 p-0 bg-white/5 border-white/10 text-white/50 hover:text-white disabled:opacity-30 transition-all"
+                >
+                  {">"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
